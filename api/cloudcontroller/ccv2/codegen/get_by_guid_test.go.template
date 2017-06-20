@@ -11,39 +11,39 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("Organization", func() {
+var _ = Describe("{{ .EntityName }}", func() {
 	var client *Client
 
 	BeforeEach(func() {
 		client = NewTestClient()
 	})
 
-	Describe("GetOrganization", func() {
-		Context("when the Organization exists", func() {
+	Describe("Get{{ .EntityName }}", func() {
+		Context("when the {{ .EntityName }} exists", func() {
 			BeforeEach(func() {
 				response := `{
 					"metadata": {
-						"guid": "some-organization-guid"
+						"guid": "some-{{ .EntityNameDashes }}-guid"
 					},
 					"entity": {
-						"name": "some-organization"
+						"name": "some-{{ .EntityNameDashes }}"
 					}
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/organizations/some-organization-guid"),
+						VerifyRequest(http.MethodGet, "/v2/{{ .EntityNameSnake }}s/some-{{ .EntityNameDashes }}-guid"),
 						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
 					))
 			})
 
-			It("returns the organization and all warnings", func() {
-				organization, warnings, err := client.GetOrganization("some-organization-guid")
+			It("returns the {{ .EntityNameSnake }} and all warnings", func() {
+				{{ .EntityNameVar }}, warnings, err := client.Get{{ .EntityName }}("some-{{ .EntityNameDashes }}-guid")
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(organization).To(Equal(
-					Organization{
-						GUID: "some-organization-guid",
-						Name: "some-organization",
+				Expect({{ .EntityNameVar }}).To(Equal(
+					{{ .EntityName }}{
+						GUID: "some-{{ .EntityNameDashes }}-guid",
+						Name: "some-{{ .EntityNameDashes }}",
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
@@ -59,13 +59,13 @@ var _ = Describe("Organization", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/organizations/some-organization-guid"),
+						VerifyRequest(http.MethodGet, "/v2/{{ .EntityNameSnake }}s/some-{{ .EntityNameSnake }}-guid"),
 						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
 					))
 			})
 
 			It("returns an error and all warnings", func() {
-				_, warnings, err := client.GetOrganization("some-organization-guid")
+				_, warnings, err := client.Get{{ .EntityName }}("some-{{ .EntityNameSnake }}-guid")
 
 				Expect(err).To(MatchError(UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,

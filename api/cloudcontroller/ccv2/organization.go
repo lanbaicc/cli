@@ -33,7 +33,7 @@ func (org *Organization) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-//go:generate go run gen_get_by_guid.go Organization
+//go:generate go run codegen/gen_get_by_guid.go Organization
 
 // GetOrganizations returns back a list of Organizations based off of the
 // provided queries.
